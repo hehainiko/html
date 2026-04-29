@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}成员管理 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>成员管理</h2>
+    <p style="color: #666;">选择代表队进入成员管理，添加或维护队员信息</p>
+</div>
+
+{% if teams %}
+<div class="card">
+    <h3>已注册代表队</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>学校</th>
+                <th>代表队</th>
+                <th>代表队编号</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td>{{ team[1] }}</td>
+                <td>{{ team[2] }}</td>
+                <td>{{ team[3] }}</td>
+                <td>
+                    <a class="btn" href="{{ url_for('team_members', team_id=team[0]) }}">管理成员</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #666;">暂无已注册的代表队</h3>
+        <p style="margin-top: 10px;">请先进行代表队报名</p>
+        <a href="{{ url_for('team_register') }}" class="btn btn-success" style="margin-top: 15px;">前往代表队报名</a>
+    </div>
+    </div>
+{% endif %}
+{% endblock %}

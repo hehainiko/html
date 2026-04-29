@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}队员管理 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>队员管理</h2>
+    <p style="color: #666;">当前代表队：{{ team[0] and team[0] or '' }}{{ team[0] and ' - ' or '' }}{{ team[1] }}</p>
+    <a class="btn" href="{{ url_for('members') }}" style="margin-top: 10px;">返回成员管理</a>
+</div>
+
+<div class="card">
+    <h3>添加新成员</h3>
+    <form method="POST" style="margin-top: 15px;">
+        <div class="form-group">
+            <label for="member_name">姓名 *</label>
+            <input id="member_name" name="member_name" required placeholder="请输入成员姓名">
+        </div>
+        <div class="form-group">
+            <label for="role">角色 *</label>
+            <select id="role" name="role" required>
+                <option value="队员">队员</option>
+                <option value="领队">领队</option>
+                <option value="队医">队医</option>
+                <option value="教练">教练</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="phone">联系电话</label>
+            <input id="phone" name="phone" placeholder="请输入联系电话（可选）">
+        </div>
+        <div class="form-group">
+            <label for="student_id">学号</label>
+            <input id="student_id" name="student_id" placeholder="请输入学号（可选）">
+        </div>
+        <button type="submit" class="btn btn-success">添加成员</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>成员列表</h3>
+    {% if members %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>姓名</th>
+                <th>角色</th>
+                <th>联系电话</th>
+                <th>学号</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in members %}
+            <tr>
+                <td>{{ m[1] }}</td>
+                <td>{{ m[2] }}</td>
+                <td>{{ m[3] or '-' }}</td>
+                <td>{{ m[4] or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #666;">当前代表队暂无成员，请先添加成员。</p>
+    {% endif %}
+</div>
+{% endblock %}

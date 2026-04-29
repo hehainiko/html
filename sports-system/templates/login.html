@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 480px; margin: 0 auto;">
+    <h2>用户登录</h2>
+    <p style="color: #666; margin-top: 8px;">管理员可访问全部功能；普通用户仅可查看查询统计。</p>
+    <form method="POST" style="margin-top: 16px;">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" required placeholder="请输入用户名，例如：admin">
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" required placeholder="请输入密码">
+        </div>
+        <button type="submit" class="btn btn-success">登录</button>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-left: 10px;">返回首页</a>
+    </form>
+</div>
+{% endblock %}

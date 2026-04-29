@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 class="text-center">学校运动会管理系统</h1>
+    <p class="text-center" style="color: #666; margin-top: 10px;">
+        全流程信息化管理，高效、精准、合规
+    </p>
+</div>
+
+{% if session.get('role') == '管理员' %}
+<div class="grid">
+    <div class="card">
+        <h3>运动员管理</h3>
+        <p>运动员信息录入，自动生成参赛编号</p>
+    <a href="{{ url_for('team_register') }}" class="btn btn-success">代表队报名</a>
+    </div>
+    
+    <div class="card">
+        <h3>裁判员管理</h3>
+        <p>裁判员信息管理，职称资格校验</p>
+    <!-- 团队化改造：移除裁判员报名入口按钮 -->
+    </div>
+    
+    <div class="card">
+        <h3>项目报名</h3>
+        <p>项目报名管理，自动校验限制规则</p>
+        <a href="{{ url_for('event_register') }}" class="btn">项目报名</a>
+    </div>
+    
+    <div class="card">
+        <h3>成绩管理</h3>
+        <p>成绩录入、排名计算、班级总分统计</p>
+        <a href="{{ url_for('score_input') }}" class="btn">成绩录入</a>
+    </div>
+    
+    <div class="card">
+        <h3>查询统计</h3>
+        <p>实时查询参赛名单、成绩、班级排名</p>
+        <a href="{{ url_for('query') }}" class="btn">查询统计</a>
+    </div>
+    
+    <div class="card">
+        <h3>系统特色</h3>
+        <ul style="margin-top: 15px; line-height: 2;">
+            <li>✓ 自动编号分配</li>
+            <li>✓ 智能裁判分配</li>
+            <li>✓ 报名限制校验</li>
+            <li>✓ 自动排名计算</li>
+            <li>✓ 班级总分统计</li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <h3>业务规则说明</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <strong>报名限制</strong>
+            <ul style="margin-top: 10px;">
+                <li>每班每项目最多5人</li>
+                <li>每人最多报3个项目</li>
+            </ul>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <strong>编号规则</strong>
+            <ul style="margin-top: 10px;">
+                <li>格式：年份-班级-流水号</li>
+                <li>示例：2024-G01-001</li>
+            </ul>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <strong>排名规则</strong>
+            <ul style="margin-top: 10px;">
+                <li>径赛：按时间升序</li>
+                <li>田赛：按距离/高度降序</li>
+            </ul>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <strong>得分规则</strong>
+            <ul style="margin-top: 10px;">
+                <li>第一名：5分</li>
+                <li>第二名：3分</li>
+                <li>第三名：1分</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

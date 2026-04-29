@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}项目报名 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>项目报名</h2>
+    <p style="color: #666;">为代表队成员报名参赛项目（每项目最多8人）</p>
+    
+    <form method="POST" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="team_id">选择代表队 *</label>
+            <select id="team_id" name="team_id" required>
+                <option value="">请选择代表队</option>
+                {% for team in teams %}
+                <option value="{{ team[0] }}">
+                    {{ team[1] }} - {{ team[2] }}（编号：{{ team[3] }}）
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="member_id">选择成员 *</label>
+            <select id="member_id" name="member_id" required>
+                <option value="">请先选择代表队</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="event_id">选择项目 *</label>
+            <select id="event_id" name="event_id" required>
+                <option value="">请选择比赛项目</option>
+                {% for event in events %}
+                <option value="{{ event[0] }}">
+                    {{ event[1] }} ({{ event[2] }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-success">确认报名</button>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-left: 10px;">返回首页</a>
+    </form>
+</div>
+
+<div class="card">
+    <h3>报名规则说明</h3>
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 4px; margin-top: 15px;">
+        <strong>⚠️ 重要提醒</strong>
+        <ul style="margin-top: 10px; line-height: 2;">
+            <li>每个项目最多可报名 8 人</li>
+            <li>先选择代表队，再选择队内成员进行报名</li>
+            <li>避免重复报名同一成员同一项目</li>
+        </ul>
+    </div>
+</div>
+
+{% if teams %}
+<div class="card">
+    <h3>已注册代表队列表</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>学校</th>
+                <th>代表队</th>
+                <th>代表队编号</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td>{{ team[1] }}</td>
+                <td>{{ team[2] }}</td>
+                <td>{{ team[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #666;">暂无已注册的代表队</h3>
+        <p style="margin-top: 10px;">请先进行代表队报名</p>
+        <a href="{{ url_for('team_register') }}" class="btn btn-success" style="margin-top: 15px;">
+        前往代表队报名
+        </a>
+    </div>
+</div>
+{% endif %}
+
+{% if events %}
+<div class="card">
+    <h3>可报名项目列表</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>项目名称</th>
+                <th>项目类型</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td>{{ event[1] }}</td>
+                <td>
+                    {% if event[2] == '径赛' %}
+                    <span style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ event[2] }}
+                    </span>
+                    {% else %}
+                    <span style="background: #f3e5f5; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ event[2] }}
+                    </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('team_id').addEventListener('change', function() {
+    const teamId = this.value;
+    const memberSelect = document.getElementById('member_id');
+    memberSelect.innerHTML = '<option value="">加载中...</option>';
+    if (!teamId) {
+        memberSelect.innerHTML = '<option value="">请先选择代表队</option>';
+        return;
+    }
+    fetch(`/api/team_members/${teamId}`)
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.error) {
+                memberSelect.innerHTML = '<option value="">加载失败</option>';
+                return;
+            }
+            memberSelect.innerHTML = '<option value="">请选择成员</option>';
+            data.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.name;
+                memberSelect.appendChild(opt);
+            });
+        })
+        .catch(() => {
+            memberSelect.innerHTML = '<option value="">加载失败</option>';
+        });
+});
+</script>
+{% endblock %}

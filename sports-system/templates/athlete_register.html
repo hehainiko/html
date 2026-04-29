@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}运动员报名 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>运动员报名</h2>
+    <p style="color: #666;">请填写运动员基本信息，系统将自动生成参赛编号</p>
+    
+    <form method="POST" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="student_id">学号 *</label>
+            <input type="text" id="student_id" name="student_id" required 
+                   placeholder="请输入学号（至少8位）" maxlength="20">
+        </div>
+        
+        <div class="form-group">
+            <label for="name">姓名 *</label>
+            <input type="text" id="name" name="name" required 
+                   placeholder="请输入姓名" maxlength="50">
+        </div>
+        
+        <div class="form-group">
+            <label for="class_name">班级 *</label>
+            <input type="text" id="class_name" name="class_name" required 
+                   placeholder="请输入班级（如：G01、G02）" maxlength="20">
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">联系方式</label>
+            <input type="text" id="phone" name="phone" 
+                   placeholder="请输入联系电话（可选）" maxlength="20">
+        </div>
+        
+        <button type="submit" class="btn btn-success">注册运动员</button>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-left: 10px;">返回首页</a>
+    </form>
+</div>
+
+<div class="card">
+    <h3>注册说明</h3>
+    <ul style="line-height: 2;">
+        <li>学号必须为8位或以上数字/字母组合</li>
+        <li>班级格式建议：G01、G02、H01等</li>
+        <li>参赛编号将自动生成，格式：年份-班级-流水号</li>
+        <li>联系方式为可选项，建议填写便于联系</li>
+        <li>注册成功后可继续进行项目报名</li>
+    </ul>
+</div>
+{% endblock %} 

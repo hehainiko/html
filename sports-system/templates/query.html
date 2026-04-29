@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}查询统计 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>查询统计</h2>
+    <p style="color: #666;">实时查询参赛名单、成绩、学校/代表队排名等信息</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>📋 参赛名单查询</h3>
+        <p>查看各项目的参赛成员名单</p>
+        <button onclick="loadRegistrations()" class="btn">查看参赛名单</button>
+    </div>
+    
+    <div class="card">
+        <h3>🏆 成绩排名查询</h3>
+        <p>查看各项目成员的成绩和奖牌</p>
+        <button onclick="loadScores()" class="btn">查看成绩排名</button>
+    </div>
+    
+    {% if session.get('role') == '管理员' %}
+    <div class="card">
+        <h3>⚙️ 数据管理</h3>
+        <p>计算排名和更新统计数据</p>
+        <button onclick="calculateRankings()" class="btn btn-success">重新计算排名</button>
+        <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('export_participants_pdf') }}" class="btn">打印参赛名单PDF</a>
+            <a href="{{ url_for('export_rankings_pdf') }}" class="btn">打印名次公告PDF</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div id="queryResults" class="card" style="display: none;">
+    <h3 id="resultsTitle">查询结果</h3>
+    <div id="resultsContent"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showResults(title, content) {
+    document.getElementById('resultsTitle').textContent = title;
+    document.getElementById('resultsContent').innerHTML = content;
+    document.getElementById('queryResults').style.display = 'block';
+    document.getElementById('queryResults').scrollIntoView({behavior: 'smooth'});
+}
+
+function loadRegistrations() {
+    fetch('/api/registrations')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showResults('参赛名单查询', `<p style="color: red;">错误：${data.error}</p>`);
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>项目</th><th>学校</th><th>代表队</th><th>成员</th><th>状态</th></tr></thead><tbody>';
+            
+            data.forEach(reg => {
+                const statusStyle = reg.status === '已参赛' ? 'background: #d4edda;' : 
+                                  reg.status === '已检录' ? 'background: #fff3cd;' : 'background: #f8d7da;';
+                html += `<tr>
+                    <td>${reg.event_name}</td>
+                    <td>${reg.school_name}</td>
+                    <td>${reg.team_name}</td>
+                    <td>${reg.member_name || '-'}</td>
+                    <td><span style="${statusStyle} padding: 4px 8px; border-radius: 4px; font-size: 12px;">${reg.status}</span></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            showResults('参赛名单查询', html);
+        })
+        .catch(error => {
+            showResults('参赛名单查询', `<p style="color: red;">请求失败：${error}</p>`);
+        });
+}
+
+function loadScores() {
+    fetch('/api/scores')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showResults('成绩排名查询', `<p style="color: red;">错误：${data.error}</p>`);
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>项目</th><th>排名</th><th>奖牌</th><th>学校</th><th>代表队</th><th>成员</th><th>成绩</th></tr></thead><tbody>';
+            
+            data.forEach(score => {
+                const rankStyle = score.ranking <= 3 ? 'font-weight: bold; color: #d4a43a;' : '';
+                const medal = score.ranking === 1 ? '金牌' : (score.ranking === 2 ? '银牌' : (score.ranking === 3 ? '铜牌' : '无'));
+                html += `<tr style="${rankStyle}">
+                    <td>${score.event_name}</td>
+                    <td>${score.ranking || '未排名'}</td>
+                    <td>${medal}</td>
+                    <td>${score.school_name}</td>
+                    <td>${score.team_name}</td>
+                    <td>${score.member_name || '-'}</td>
+                    <td>${score.score_value}${score.score_unit}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            showResults('成绩排名查询', html);
+        })
+        .catch(error => {
+            showResults('成绩排名查询', `<p style="color: red;">请求失败：${error}</p>`);
+        });
+}
+
+
+function calculateRankings() {
+    if (!confirm('确定要重新计算所有项目的排名吗？此操作将更新所有成绩的排名与奖牌。')) {
+        return;
+    }
+    
+    fetch('/api/calculate_all_rankings', {method: 'POST'})
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(`计算失败：${data.error}`);
+                return;
+            }
+            alert(data.message);
+            // 自动刷新成绩排名
+            loadScores();
+        })
+        .catch(error => {
+            alert(`请求失败：${error}`);
+        });
+}
+
+// 页面加载时自动显示参赛名单
+document.addEventListener('DOMContentLoaded', function() {
+    loadRegistrations();
+});
+</script>
+{% endblock %}

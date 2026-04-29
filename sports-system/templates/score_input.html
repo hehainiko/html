@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}成绩录入 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>成绩录入</h2>
+    <p style="color: #666;">为已检录的代表队录入比赛成绩</p>
+    
+    {% if registrations %}
+    <form method="POST" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="registration_id">选择参赛记录 *</label>
+            <select id="registration_id" name="registration_id" required>
+                <option value="">请选择参赛记录</option>
+                {% for reg in registrations %}
+                <option value="{{ reg[0] }}">
+                    {{ reg[1] }} - {{ reg[2] }} ｜ {{ reg[3] }} ({{ reg[4] }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="member_id">选择成员 *</label>
+            <select id="member_id" name="member_id" required>
+                <option value="">请先选择参赛记录</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="score_value">成绩值 *</label>
+            <input type="number" id="score_value" name="score_value" step="0.001" required 
+                   placeholder="请输入成绩（如：12.56 或 1.85）">
+        </div>
+        
+        <div class="form-group">
+            <label for="score_unit">成绩单位 *</label>
+            <select id="score_unit" name="score_unit" required>
+                <option value="">请选择单位</option>
+                <option value="秒">秒（径赛时间）</option>
+                <option value="米">米（跳远、铅球等）</option>
+                <option value="厘米">厘米（跳高等）</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="stage">赛程 *</label>
+            <select id="stage" name="stage" required>
+                <option value="">请选择赛程</option>
+                <option value="预赛">预赛</option>
+                <option value="半决赛">半决赛</option>
+                <option value="决赛" selected>决赛</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="recorded_by">录入人</label>
+            <input type="text" id="recorded_by" name="recorded_by" 
+                   placeholder="请输入录入人姓名（可选）" value="系统">
+        </div>
+        
+        <button type="submit" class="btn btn-success">录入成绩</button>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-left: 10px;">返回首页</a>
+    </form>
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3 style="color: #666;">暂无待录入成绩的参赛记录</h3>
+        <p style="margin-top: 10px;">请确保代表队已完成项目报名和检录</p>
+        <a href="{{ url_for('event_register') }}" class="btn btn-success" style="margin-top: 15px;">
+            前往项目报名
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>成绩录入说明</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 4px;">
+            <strong>径赛项目</strong>
+            <ul style="margin-top: 10px; line-height: 2;">
+                <li>时间单位：秒</li>
+                <li>格式：12.56（保留小数）</li>
+                <li>排名：时间越短排名越高</li>
+            </ul>
+        </div>
+        
+        <div style="background: #f3e5f5; padding: 15px; border-radius: 4px;">
+            <strong>田赛项目</strong>
+            <ul style="margin-top: 10px; line-height: 2;">
+                <li>距离单位：米或厘米</li>
+                <li>格式：6.85米 或 185厘米</li>
+                <li>排名：距离/高度越大排名越高</li>
+            </ul>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 4px;">
+            <strong>自动功能</strong>
+            <ul style="margin-top: 10px; line-height: 2;">
+                <li>自动计算排名</li>
+                <li>自动分配奖牌（基于排名）</li>
+                <li>自动更新学校总分</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if registrations %}
+<div class="card">
+    <h3>参赛记录管理</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>学校</th>
+                <th>代表队</th>
+                <th>项目</th>
+                <th>项目类型</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in registrations %}
+            <tr>
+                <td>{{ reg[1] }}</td>
+                <td>{{ reg[2] }}</td>
+                <td>{{ reg[3] }}</td>
+                <td>
+                    {% if reg[4] == '径赛' %}
+                    <span style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ reg[4] }}
+                    </span>
+                    {% else %}
+                    <span style="background: #f3e5f5; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ reg[4] }}
+                    </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span style="background: #d4edda; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        待录入成绩
+                    </span>
+                </td>
+                <td>
+                    <form method="POST" style="display: inline; margin-right: 10px;">
+                        <input type="hidden" name="action" value="checkin">
+                        <input type="hidden" name="registration_id" value="{{ reg[0] }}">
+                        <button type="submit" class="btn" style="font-size: 12px; padding: 4px 8px;">
+                            检录
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('registration_id').addEventListener('change', function() {
+    const regId = this.value;
+    const memberSelect = document.getElementById('member_id');
+    memberSelect.innerHTML = '<option value="">加载中...</option>';
+    if (!regId) {
+        memberSelect.innerHTML = '<option value="">请先选择参赛记录</option>';
+        return;
+    }
+    fetch(`/api/registration_members/${regId}`)
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.error) {
+                memberSelect.innerHTML = '<option value="">加载失败</option>';
+                return;
+            }
+            memberSelect.innerHTML = '<option value="">请选择成员</option>';
+            data.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.name;
+                memberSelect.appendChild(opt);
+            });
+        })
+        .catch(() => {
+            memberSelect.innerHTML = '<option value="">加载失败</option>';
+        });
+});
+</script>
+{% endblock %}

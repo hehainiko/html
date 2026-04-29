@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}代表队报名 - 学校运动会管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>代表队报名</h2>
+    <p style="color: #666;">请填写学校与代表队信息，系统将自动生成代表队编号</p>
+    
+    <form method="POST" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="school_name">学校名称 *</label>
+            <input type="text" id="school_name" name="school_name" required 
+                   placeholder="请输入学校名称" maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="team_name">代表队名称 *</label>
+            <input type="text" id="team_name" name="team_name" required 
+                   placeholder="请输入代表队名称（如：一队、二队）" maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="leader_name">领队姓名</label>
+            <input type="text" id="leader_name" name="leader_name" 
+                   placeholder="可选填写领队姓名" maxlength="50">
+        </div>
+
+        <div class="form-group">
+            <label for="leader_phone">领队联系方式</label>
+            <input type="text" id="leader_phone" name="leader_phone" 
+                   placeholder="可选填写领队联系电话" maxlength="20">
+        </div>
+
+        <button type="submit" class="btn btn-success">注册代表队</button>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-left: 10px;">返回首页</a>
+    </form>
+</div>
+
+<div class="card">
+    <h3>注册说明</h3>
+    <ul style="line-height: 2;">
+        <li>系统会生成代表队编号，格式：年份-学校-流水号</li>
+        <li>领队信息为可选项，提交后可在成员管理中补充队员与队医</li>
+        <li>代表队注册成功后可继续进行项目报名</li>
+    </ul>
+    </div>
+{% endblock %}
